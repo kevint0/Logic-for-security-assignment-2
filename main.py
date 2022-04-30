@@ -25,4 +25,34 @@ def login(username, password):
         print("username not found")
         return
 
-login(username, password)
+currentUser = login(username, password)
+def patientOptions():
+    print("press 1 to book appointment, press 2 to book test, press 3 to book a vaccination, press 4 to access you"
+          " information")
+    response = int(input())
+    if response == 1:
+        return
+    elif response == 2:
+        return
+    elif response == 3:
+        return
+    elif response == 4:
+        return
+    else:
+        print("bad entry")
+        patientOptions()
+
+
+def doctorOptions():
+    print("press 1 to update patient vaccination")
+    response = int(input())
+    if response == 1:
+        return
+    else:
+        print("bad entry")
+        doctorOptions()
+
+if currentUser.role == "patient":
+    patientOptions()
+elif currentUser.role == "doctor":
+    doctorOptions()
