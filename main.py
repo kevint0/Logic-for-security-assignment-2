@@ -1,7 +1,7 @@
 import pandas as pd
 from User import User
 
-print("enter login")
+print("enter username")
 username = input()
 print("enter password")
 password = input()
@@ -27,16 +27,38 @@ def login(username, password):
 
 currentUser = login(username, password)
 def patientOptions():
-    print("press 1 to book appointment, press 2 to book test, press 3 to book a vaccination, press 4 to access you"
+    print("press 1 to book a test, press 2 to book a vaccination, press 3 to access your"
           " information")
     response = int(input())
+
     if response == 1:
+        with open('Appointments.csv') as Appointments:
+            if currentUser != None:
+                appInfo = pd.read_csv(Appointments)
+                usernames_ = appInfo.username
+                for i in usernames_:
+                    if i == str(currentUser.username):
+                        a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
+                        if a_booked.iloc[0]["type"] == "test":
+                            print("A test appointment has already been made for " + str(currentUser.username))
+                    else:
+                        print("Booking test appointment for " + str(currentUser.username))
+
         return
     elif response == 2:
+        with open('Appointments.csv') as Appointments:
+            if currentUser != None:
+                appInfo = pd.read_csv(Appointments)
+                usernames_ = appInfo.username
+                for i in usernames_:
+                    if i == str(currentUser.username):
+                        a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
+                        if a_booked.iloc[0]["type"] == "vacc":
+                            print("A vaccination appointment has already been made for " + str(currentUser.username))
+                    else:
+                        print("Booking vaccination appointment for " + str(currentUser.username))
         return
     elif response == 3:
-        return
-    elif response == 4:
         return
     else:
         print("bad entry")

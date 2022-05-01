@@ -1,3 +1,5 @@
 username,password,role
 benny,benny,patient
+casper,12,patient
+dennis,beans,patient
 boris,2,doctor
