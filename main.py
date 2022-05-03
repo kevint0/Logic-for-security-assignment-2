@@ -11,6 +11,12 @@ class Interger_(int):
          l = self.l
          return l
 
+class Dataframe_(pd.DataFrame):
+    @property
+    def _constructor(self, l):
+        l = self.l
+        return SubclassedDataFrame
+
 
 print("Press 1 to login, or press 2 to view public data")
 response = int(input())
@@ -28,7 +34,8 @@ if response == 1:
 
     def login(username, password):
         with open('LoginDetails.csv') as loginDetails:
-            accountData = pd.read_csv(loginDetails)
+            accountData = Dataframe_(pd.read_csv(loginDetails))
+            accountData.label = "H"
             usernames = accountData.username
             j = 0
             for i in usernames:
