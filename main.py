@@ -1,5 +1,6 @@
 import pandas as pd
 from User import User
+import datetime
 
 class String_(str):
      def label(self, l):
@@ -93,11 +94,20 @@ if response == 1:
                 if currentUser != None:
                     appInfo = pd.read_csv(Appointments)
                     usernames_ = appInfo.username
+                    present = datetime.datetime.now()
+                    print("This is the present: " + str(present))
+                    #present = datetime.datetime.combine(present, datetime.time(0, 0))
                     for i in usernames_:
                         if i == str(currentUser.username):
                             a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
+                            date_ = datetime.datetime.strptime(a_booked.iloc[0]["date"], "%d/%m/%y").date()
+                            date_ = datetime.datetime.combine(date_, datetime.time(0, 0))
+                            print("This is the date: " + str(date_))
+                            isTested = True if (a_booked.iloc[0]["type"] == "test") and (date_ < present) else False
+                            isVaccinated = True if (a_booked.iloc[0]["type"] == "vacc") and (date_ < present) else False
                             print("The following information is stored for " + str(currentUser.username) + ": \n" +
-                            "")
+                            "Patient has been tested: " + str(isTested) + "\n"
+                            "Patient has been vaccinated: " + str(isVaccinated))
             return
         else:
             print("bad entry")
