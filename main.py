@@ -20,21 +20,27 @@ class Dataframe_(pd.DataFrame):
         l = self.l
         return SubclassedDataFrame
 
-#start_date = datetime.date(2022, 5, 1)
-#end_date = datetime.date(2022, 12, 24)
 
-#time_between_dates = end_date - start_date
-#days_between_dates = time_between_dates.days
-#random_number_of_days = random.randrange(days_between_dates)
-#random_date = start_date + datetime.timedelta(days=random_number_of_days)
+def eu_data():
+    with open('Appointments.csv') as Appointments:
+        appInfo = pd.read_csv(Appointments)
+        present = datetime.datetime.now()
+        a_booked = appInfo.loc[(appInfo['type'] == "test")]
 
-#print(random_date)
+        for i in a_booked.values:
+            date_ = datetime.datetime.strptime(i[2], "%d/%m/%y").date()
+            date_ = datetime.datetime.combine(date_, datetime.time(0, 0))
+            if date_ < present:
+                with open('eu_database.csv') as Data_:
+                    dataInfo = pd.read_csv(Data_)
+                    res_ = random.randint(0,1)
+                    df2 = pd.DataFrame({"id":[i[0]], "type":["test"], "result":[res_]})
+                    new_ = pd.concat([dataInfo,df2], axis=0)
 
-#def random_date(seed):
-#    random.seed(seed)
-#    d = random.randint(1, int(time.time()))
-#    return datetime.datetime.fromtimestamp(d).strftime('%d/%m/%y')
-#print(random_date(random.randint(0, 1000)))
+                    new_.to_csv('eu_database.csv', index=False)
+
+        return
+
 
 print("Press 1 to login, or press 2 to view public data")
 response = int(input())
@@ -55,21 +61,25 @@ if response == 1:
             accountData = Dataframe_(pd.read_csv(loginDetails))
             accountData.label = "H"
             usernames = accountData.username
+            print(usernames)
             j = 0
             for i in usernames:
-                print(accountData.iloc[j,1])
+
+                print(accountData.iloc[j]["password"])
                 if username == i:
-                    if accountData.iloc[j,1] == password:
-                        currentUser = User(username, accountData.iloc[j,2])
+                    if accountData.iloc[j]["password"] == password:
+                        currentUser = User(username, accountData.iloc[j]["role"])
                         print("you are logged in as " + username)
+                        j += 1
                         return currentUser
                     else:
                         print("password does not match")
-                        exit()
+
                 elif username != i:
-                    print("username not found")
-                    exit()
-                j += 1
+
+                    j += 1
+
+                #j += 1
 
             return
 
@@ -84,31 +94,18 @@ if response == 1:
                 if currentUser != None:
                     appInfo = pd.read_csv(Appointments)
                     usernames_ = appInfo.username
+                    name_list = []
                     for i in usernames_:
+                        name_list.append(i)
 
-                        if i == str(currentUser.username):
-                            a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
-                            if a_booked.iloc[0]["type"] == "test":
-                                print("A test appointment has already been made for " + str(currentUser.username))
-                                exit()
-                            elif a_booked.iloc[0]["type"] == "vacc":
-                                print("Booking test appointment for " + str(currentUser.username))
-                                start_date = "05/05/22"
-                                date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
 
-                                end_date = date_1 + datetime.timedelta(days=random.randint(0, 100))
 
-                                st_1 = str(end_date)
-                                st_2 = st_1[0:10]
-                                st_3 = st_2[8:10] + "/" + st_2[5:7] + "/" + st_2[2:4]
+                    if currentUser.username in name_list:
+                        a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
+                        if "test" in a_booked.values:
+                            print("A test appointment has already been made for " + str(currentUser.username))
 
-                                df2 = pd.DataFrame({"username":[currentUser.username], "type":["test"], "date":[st_3]})
-                                new_ = pd.concat([appInfo,df2], axis=0)
-
-                                new_.to_csv('Appointments.csv', index=False)
-
-                            return
-                        elif i != str(currentUser.username):
+                        elif "vacc" in a_booked.values:
                             print("Booking test appointment for " + str(currentUser.username))
                             start_date = "05/05/22"
                             date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
@@ -123,7 +120,24 @@ if response == 1:
                             new_ = pd.concat([appInfo,df2], axis=0)
 
                             new_.to_csv('Appointments.csv', index=False)
-                            return
+
+                        return
+                    elif currentUser.username not in name_list:
+                        print("Booking test appointment for " + str(currentUser.username))
+                        start_date = "05/05/22"
+                        date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
+
+                        end_date = date_1 + datetime.timedelta(days=random.randint(0, 100))
+
+                        st_1 = str(end_date)
+                        st_2 = st_1[0:10]
+                        st_3 = st_2[8:10] + "/" + st_2[5:7] + "/" + st_2[2:4]
+
+                        df2 = pd.DataFrame({"username":[currentUser.username], "type":["test"], "date":[st_3]})
+                        new_ = pd.concat([appInfo,df2], axis=0)
+
+                        new_.to_csv('Appointments.csv', index=False)
+                        return
 
 
 
@@ -134,30 +148,22 @@ if response == 1:
                 if currentUser != None:
                     appInfo = pd.read_csv(Appointments)
                     usernames_ = appInfo.username
+                    name_list = []
                     for i in usernames_:
-                        if i == str(currentUser.username):
-                            a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
-                            if a_booked.iloc[0]["type"] == "vacc":
-                                print("A vaccination appointment has already been made for " + str(currentUser.username))
-                                exit()
-                            elif a_booked.iloc[0]["type"] == "test":
-                                print("Booking vaccination appointment for " + str(currentUser.username))
-                                start_date = "05/05/22"
-                                date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
+                        name_list.append(i)
+                    print(name_list)
 
-                                end_date = date_1 + datetime.timedelta(days=random.randint(0, 100))
 
-                                st_1 = str(end_date)
-                                st_2 = st_1[0:10]
-                                st_3 = st_2[8:10] + "/" + st_2[5:7] + "/" + st_2[2:4]
+                    if currentUser.username in name_list:
+    
+                        a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
 
-                                df2 = pd.DataFrame({"username":[currentUser.username], "type":["vacc"], "date":[st_3]})
-                                new_ = pd.concat([appInfo,df2], axis=0)
+                        if "vacc" in a_booked.values:
 
-                                new_.to_csv('Appointments.csv', index=False)
-                                return
+                            print("A vaccination appointment has already been made for " + str(currentUser.username))
 
-                        elif i != str(currentUser.username):
+                        elif "test" in a_booked.values:
+
                             print("Booking vaccination appointment for " + str(currentUser.username))
                             start_date = "05/05/22"
                             date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
@@ -172,27 +178,56 @@ if response == 1:
                             new_ = pd.concat([appInfo,df2], axis=0)
 
                             new_.to_csv('Appointments.csv', index=False)
-                            return
+                        return
+
+                    elif currentUser.username not in name_list:
+                        print("Booking vaccination appointment for " + str(currentUser.username))
+                        start_date = "05/05/22"
+                        date_1 = datetime.datetime.strptime(start_date, "%d/%m/%y")
+
+                        end_date = date_1 + datetime.timedelta(days=random.randint(0, 100))
+
+                        st_1 = str(end_date)
+                        st_2 = st_1[0:10]
+                        st_3 = st_2[8:10] + "/" + st_2[5:7] + "/" + st_2[2:4]
+
+                        df2 = pd.DataFrame({"username":[currentUser.username], "type":["vacc"], "date":[st_3]})
+                        new_ = pd.concat([appInfo,df2], axis=0)
+
+                        new_.to_csv('Appointments.csv', index=False)
+                        return
             return
         elif response == 3:
             with open('Appointments.csv') as Appointments:
-                if currentUser != None:
-                    appInfo = pd.read_csv(Appointments)
-                    usernames_ = appInfo.username
-                    present = datetime.datetime.now()
-                    print("This is the present: " + str(present))
-                    #present = datetime.datetime.combine(present, datetime.time(0, 0))
-                    for i in usernames_:
-                        if i == str(currentUser.username):
+                with open('eu_database.csv') as eu:
+                    if currentUser != None:
+                        appInfo = pd.read_csv(Appointments)
+                        eu_data = pd.read_csv(eu)
+                        usernames_ = eu_data.id
+                        present = datetime.datetime.now()
+                        print(usernames_)
+                        print("This is the present: " + str(present))
+                        #present = datetime.datetime.combine(present, datetime.time(0, 0))
+
+                        if str(currentUser.username) in usernames_.values:
+
+
+                            user_status = eu_data.loc[eu_data['id'] == currentUser.username]
+                            val_ = user_status.values
                             a_booked = appInfo.loc[appInfo['username'] == currentUser.username]
+
                             date_ = datetime.datetime.strptime(a_booked.iloc[0]["date"], "%d/%m/%y").date()
                             date_ = datetime.datetime.combine(date_, datetime.time(0, 0))
-                            print("This is the date: " + str(date_))
+
                             isTested = True if (a_booked.iloc[0]["type"] == "test") and (date_ < present) else False
                             isVaccinated = True if (a_booked.iloc[0]["type"] == "vacc") and (date_ < present) else False
+                            testResult = "Positive" if val_[0][2] == 1 else "Negative"
                             print("The following information is stored for " + str(currentUser.username) + ": \n" +
-                            "Patient has been tested: " + str(isTested) + "\n"
+                            "Patient has been tested: " + str(isTested) + " The result is: " +  testResult + "\n"
                             "Patient has been vaccinated: " + str(isVaccinated))
+                        else:
+                            print("This patient has no data")
+                            return
             return
         else:
             print("bad entry")
@@ -221,11 +256,11 @@ elif response == 2:
         present = datetime.datetime.now()
         test_ = appInfo.loc[appInfo['type'] != ""]
 
-        print(len(test_.iloc[:]["date"]))
+        #print(len(test_.iloc[:]["date"]))
         list_tested = []
         list_vaccinated = []
         for i in range(len(test_.iloc[:]["date"])):
-            print(i)
+            #print(i)
             date_ = datetime.datetime.strptime(test_.iloc[i]["date"], "%d/%m/%y").date()
             date_ = datetime.datetime.combine(date_, datetime.time(0, 0))
             list_tested.append(1) if (test_.iloc[i]["type"] == "test") and (date_ < present) else 0
@@ -236,7 +271,10 @@ elif response == 2:
         print("Currently, this many tests have been made: " + str(sum(list_tested)))
         print("Currently, this many vaccinations have take place: " + str(sum(list_vaccinated)))
 
-        print(test_)
+
 
         #for i in range(0,2):
         #    print(appInfo.iloc[i]["date"])
+
+elif response == 3:
+    eu_data()
